@@ -1,26 +1,25 @@
-# EZE cohort
-  # Filtering out patients, renaming columns
+# EZE cohort: Therapy Signatures
+  # Data cleaning, filtering out patients, renaming and recoding columns
+  # Author: Graziella Credidio
 
-graphics.off()
-rm(list = ls())
-
-setwd("C:\\Documents\\Masters thesis\\EZE_cohort") #laptop
-setwd("D:\\Documentos\\Workspace\\Masters-Thesis\\EZE\\EZE_cohort") #PC
 
 # Loading packages ----
 library(tidyverse)
-# loading data ----
-data <- read.csv("Raw_tables\\EZECohort-GraziellaEZE_DATA_2023-01-23_1313.csv")
+library(stringr)
+library(rebus)
 
-# removing patients (non omics, NA in biologics and comination of therapies not included) ----
-excluded_patients <- c("EZE323","EZE421") # NA biologics
+# Loading data ----
+data <- read.csv("./Raw_tables/EZECohort_coldata_raw.csv")
+
+# Remove patients that will not be included in analysis (non omics, NA in biologics and combination of therapies) ----
+excluded_patients <- c("EZE323","EZE421")
             
 data_filtered <- data %>%
   filter(inclusion_omics == 1) %>% 
   filter(!((study_id %in% excluded_patients)))
 
-# relabelling and recoding columns ----
-data_filtered_labelled <- data_filtered %>%
+# Recode columns ----
+data_filtered <- data_filtered %>%
   dplyr::rename("CD" = "diagnosis___1",
          "UC" = "diagnosis___2",
          "RA" = "diagnosis___4",
@@ -45,7 +44,7 @@ data_filtered_labelled <- data_filtered %>%
          "Mepacrine" = "current_system_therapy___14",
          "No_syst" = "current_system_therapy___99")
 
-data_filtered_labelled <- data_filtered_labelled %>% 
+data_filtered <- data_filtered %>% 
   mutate(Infliximab = as.integer(current_biologics == 1),
          Adalimumab = as.integer(current_biologics == 2),
          Certolizumab_pegol = as.integer(current_biologics == 3),
@@ -74,8 +73,7 @@ data_filtered_labelled <- data_filtered_labelled %>%
          New_therapy_after_sampling = as.integer(current_biologics == 98),
          None_above = as.integer(current_biologics == 99))
 
-
-data_filtered_labelled <- data_filtered_labelled %>% 
+data_filtered <- data_filtered %>% 
   mutate(current_biologics = recode(current_biologics,
                                     "1" = "Infliximab",
                                     "2" = "Adalimumab",
@@ -105,12 +103,73 @@ data_filtered_labelled <- data_filtered_labelled %>%
                                     "98" = "New_therapy_after_sampling",
                                     "99" = "None"))
 
+data_filtered <- data_filtered %>% 
+  mutate(sex = recode(sex,
+                      "1" = "Male",
+                      "2" = "Female"))
+
+data_filtered <- data_filtered %>% 
+  mutate(smoking = recode(smoking,
+                          "0" = "Never",
+                          "1" = "Ex",
+                          "2" = "Current"))
+
+data_filtered <- data_filtered %>% 
+  mutate(bmi_class = as.factor(case_when(
+    bmi < 18 ~ "Malnutrition",
+    bmi >= 18 & bmi < 25 ~ "Healthy",
+    bmi >= 25 & bmi < 30 ~ "Overweight",
+    bmi >= 30 & bmi < 35 ~ "Obesity_I",
+    bmi >= 35 & bmi < 40 ~ "Obesity_II",
+    bmi >= 40 ~ "Obesity_III"
+  ))) %>%
+  relocate(bmi_class, .after = bmi) 
+
+data_filtered <- data_filtered %>% 
+  mutate(biologics = ifelse(current_biologics == "None" | current_biologics == "New_therapy_after_sampling", "no_biologics", "biologics")) %>%
+  relocate(biologics, .after = current_biologics)
+
+# Create age groups ----
+data_filtered <- data_filtered %>% 
+  mutate(age_group = cut(age, breaks=c(0,25,65,Inf), include.lowest = FALSE, labels = c("Young", "Adult", "Senior"))) %>% 
+  relocate(age_group, .after = age) 
+
+# Cleaning diagnosis columns ----
+# Rename diagnosis column
+data_filtered <- data_filtered %>% 
+  dplyr::rename(diagnosis_class = "diagnosis_freetext_cleaned")
+
+# Reorder diagnosis combinations to match
+data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Pso, CD"] <- "CD, Pso"
+data_filtered$diagnosis_class[data_filtered$diagnosis_class == "RA, CD"] <- "CD, RA"
+data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Pso, RA"] <- "RA, Pso"
+data_filtered$diagnosis_class[data_filtered$diagnosis_class == "SLE, RA"] <- "RA, SLE"
+
+# Rename diagnosis as "other"
+data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Palindromic rheumatism" |
+                                data_filtered$diagnosis_class == "Still's disease" |
+                                data_filtered$diagnosis_class == "Still's disease, Pso" |
+                                data_filtered$diagnosis_class == "TRAPS" |
+                                data_filtered$diagnosis_class == "SpA" |
+                                data_filtered$diagnosis_class == "SpA, Pso" |
+                                data_filtered$diagnosis_class == "GPA" |
+                                data_filtered$diagnosis_class == "GCA" |
+                                data_filtered$diagnosis_class == "Celiac disease" |
+                                data_filtered$diagnosis_class == "ANCA-associated vasculitis"|
+                                data_filtered$diagnosis_class == "RA, SpA"] <- "Other"
+# cleaning special characters
+data_filtered$diagnosis_class <- str_replace_all(data_filtered$diagnosis_class, ", ", "_")
+
+# Replacing NAs ----
+data_filtered$smoking <- str_replace_na(data_filtered$smoking, "NA")
+data_filtered$remission <- str_replace_na(data_filtered$remission, "NA")
+data_filtered$bmi_class <- str_replace_na(data_filtered$bmi_class, "NA") 
 
 
-data_filtered_labelled %>% 
-  group_by(current_biologics) %>% 
-  summarise(no_rows = length(current_biologics)) 
+# Selecting data to be saved----
+coldata_EZE <- data_filtered %>% 
+  select("study_id", "diagnosis_class", "age_group", "sex", "remission", "bmi_class",
+         "smoking", "Azathioprin":"crp", "biologics":"comorb_diabetes")
 
 # Writing and loading processed data tables ----
-write.csv(data_filtered_labelled, "Cleaned_tables/EZECohort_includedPatients_complete_labelled_09.02.csv", row.names = FALSE) #31.01: exclusion of combination therapy patients
-write.table(data_filtered_labelled, "Cleaned_tables/EZECohort_includedPatients_complete_labelled_09.02.txt", sep="\t", row.names = TRUE)
+write.csv(coldata_EZE, "Cleaned_tables/EZECohort_coldata_clean.csv", row.names = FALSE)
