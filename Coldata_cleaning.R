@@ -172,4 +172,4 @@ coldata_EZE <- data_filtered %>%
          "smoking", "Azathioprin":"crp", "biologics":"comorb_diabetes")
 
 # Writing and loading processed data tables ----
-write.csv(coldata_EZE, "Cleaned_tables/EZECohort_coldata_clean.csv", row.names = FALSE)
+write.table(coldata_EZE, "Cleaned_tables/EZECohort_coldata_clean.txt", sep="\t", row.names = TRUE)
