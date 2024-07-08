@@ -2,6 +2,7 @@
   # Data cleaning, filtering out patients, renaming and recoding columns
   # Author: Graziella Credidio
 
+rm(list = ls())
 
 # Loading packages ----
 library(tidyverse)
@@ -11,8 +12,9 @@ library(rebus)
 # Loading data ----
 data <- read.csv("./Raw_tables/EZECohort_coldata_raw.csv")
 
-# Remove patients that will not be included in analysis (non omics, NA in biologics and combination of therapies) ----
-excluded_patients <- c("EZE323","EZE421")
+# Remove patients that will not be included in analysis (non omics, outliers) ----
+excluded_patients <- c("EZE323","EZE421", "EZE253", "EZE128", "EZE023", "EZE565", "EZE272", "EZE151", "EZE357")
+
             
 data_filtered <- data %>%
   filter(inclusion_omics == 1) %>% 
@@ -104,6 +106,32 @@ data_filtered <- data_filtered %>%
                                     "99" = "None"))
 
 data_filtered <- data_filtered %>% 
+  mutate(biologics_TNF = case_when(
+    (current_biologics == "Infliximab" |
+       current_biologics == "Golimumab" |
+       current_biologics == "Etanercept" |
+       current_biologics == "Certolizumab_pegol" |
+       current_biologics == "Adalimumab") ~ "anti_tnf",
+    
+    (current_biologics == "Ustekinumab"|
+       current_biologics == "Vedolizumab" |
+       current_biologics == "Belimumab" |
+       current_biologics == "Rituximab" |
+       current_biologics == "Secukinumab" |
+       current_biologics == "Tocilizumab" |
+       current_biologics == "Abatacept" |
+       current_biologics == "Anakinra") ~"non_anti_tnf",
+    
+    (current_biologics == "None" | current_biologics == "New_therapy_after_sampling") ~ "no_biologics"
+  )) %>%
+  relocate(biologics_TNF, .after = current_biologics) 
+
+
+data_filtered <- data_filtered %>% 
+  mutate(biologics = ifelse(current_biologics == "None" | current_biologics == "New_therapy_after_sampling", "no_biologics", "biologics")) %>%
+  relocate(biologics, .after = current_biologics)
+
+data_filtered <- data_filtered %>% 
   mutate(sex = recode(sex,
                       "1" = "Male",
                       "2" = "Female"))
@@ -125,14 +153,22 @@ data_filtered <- data_filtered %>%
   ))) %>%
   relocate(bmi_class, .after = bmi) 
 
+
 data_filtered <- data_filtered %>% 
-  mutate(biologics = ifelse(current_biologics == "None" | current_biologics == "New_therapy_after_sampling", "no_biologics", "biologics")) %>%
-  relocate(biologics, .after = current_biologics)
+  mutate(prednisolone_status = recode(prednisolone_status,
+                                      "1" = "Never",
+                                      "2" = "Former",
+                                      "3" = "Current"))
+
+data_filtered <- data_filtered %>% 
+  mutate(remission = recode(remission,
+                            "0" = "NR",
+                            "1" = "R"))
 
 # Create age groups ----
 data_filtered <- data_filtered %>% 
-  mutate(age_group = cut(age, breaks=c(0,25,65,Inf), include.lowest = FALSE, labels = c("Young", "Adult", "Senior"))) %>% 
-  relocate(age_group, .after = age) 
+  mutate(age_group = cut(age, breaks=c(0,20,35,50,65,Inf), include.lowest = FALSE, labels = c("0_20", "21_35", "36_50", "51_65", "65_inf"))) %>% 
+  relocate(age_group, .after = age)
 
 # Cleaning diagnosis columns ----
 # Rename diagnosis column
@@ -145,7 +181,7 @@ data_filtered$diagnosis_class[data_filtered$diagnosis_class == "RA, CD"] <- "CD,
 data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Pso, RA"] <- "RA, Pso"
 data_filtered$diagnosis_class[data_filtered$diagnosis_class == "SLE, RA"] <- "RA, SLE"
 
-# Rename diagnosis as "other"
+# Rename diagnosis as "other" 
 data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Palindromic rheumatism" |
                                 data_filtered$diagnosis_class == "Still's disease" |
                                 data_filtered$diagnosis_class == "Still's disease, Pso" |
@@ -157,19 +193,39 @@ data_filtered$diagnosis_class[data_filtered$diagnosis_class == "Palindromic rheu
                                 data_filtered$diagnosis_class == "Celiac disease" |
                                 data_filtered$diagnosis_class == "ANCA-associated vasculitis"|
                                 data_filtered$diagnosis_class == "RA, SpA"] <- "Other"
-# cleaning special characters
+
+# Clean special characters ----
 data_filtered$diagnosis_class <- str_replace_all(data_filtered$diagnosis_class, ", ", "_")
 
-# Replacing NAs ----
+# NAs ----
+# Replace empty cells with NA
 data_filtered$smoking <- str_replace_na(data_filtered$smoking, "NA")
 data_filtered$remission <- str_replace_na(data_filtered$remission, "NA")
 data_filtered$bmi_class <- str_replace_na(data_filtered$bmi_class, "NA") 
 
+# Exclude patients without crp and bmi data
+data_filtered <- data_filtered %>% 
+  filter(!(is.na(crp))) %>% 
+  filter(!(is.na(bmi_class)))
 
-# Selecting data to be saved----
-coldata_EZE <- data_filtered %>% 
-  select("study_id", "diagnosis_class", "age_group", "sex", "remission", "bmi_class",
-         "smoking", "Azathioprin":"crp", "biologics":"comorb_diabetes")
+# Exclude patients with more than one diagnosis
+data_filtered <- data_filtered %>% 
+  filter(diagnosis_class == "CD" | diagnosis_class == "PsA" |
+           diagnosis_class == "Pso" |diagnosis_class == "RA" |
+           diagnosis_class == "SLE" | diagnosis_class == "UC" |
+           diagnosis_class == "Arthrosis")
 
-# Writing and loading processed data tables ----
-write.table(coldata_EZE, "Cleaned_tables/EZECohort_coldata_clean.txt", sep="\t", row.names = TRUE)
+# Log transformation of CRP levels ----
+data_filtered <- data_filtered %>% 
+  mutate(crp_log = log(crp + 0.001)) %>% 
+  relocate(crp_log, .after = crp)
+
+# Selecting data that will be used for models ----
+coldata_maaslin <- data_filtered %>% 
+  dplyr::select("study_id", "diagnosis_class", "age_group", "sex", "remission", "bmi_class", 
+                "Azathioprin", "Prednisolon", "No_syst", "crp_log", "current_biologics", 
+                "biologics_TNF", "biologics")
+
+# Saving cleaned data tables ----
+write.table(data_filtered, "Cleaned_tables/EZECohort_coldata_clean.txt", sep="\t", row.names = TRUE)
+write.table(coldata_maaslin, "Cleaned_tables/EZECohort_coldata_models.txt", sep="\t", row.names = FALSE) 
