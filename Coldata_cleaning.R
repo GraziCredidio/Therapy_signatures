@@ -9,6 +9,11 @@ library(tidyverse)
 library(stringr)
 library(rebus)
 
+folder <- "Cleaned_tables/"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading data ----
 data <- read.csv("./Raw_tables/EZECohort_coldata_raw.csv")
 
