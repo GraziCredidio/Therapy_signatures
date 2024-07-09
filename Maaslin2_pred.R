@@ -41,4 +41,4 @@ maaslin2_all_results_pred_noSyst <- fit_data_pred_noSyst$results
 maaslin2_results_pred_noSyst <- maaslin2_all_results_pred_noSyst %>% filter(metadata == 'pred_vs_noSyst_mod') 
 maaslin2_results_pred_noSyst$qval <- p.adjust(maaslin2_results_pred_noSyst$pval, method = 'BH')
 
-write.table(maaslin2_results_pred_noSyst, "Output_files/Maaslin2/pred_vs_noSyst/maaslin2_results_pred_vs_noSyst.txt", sep = "\t",  quote = FALSE)
+write.table(maaslin2_results_pred_noSyst, "Output_files/Maaslin2/maaslin2_results_pred_vs_noSyst.txt", sep = "\t",  quote = FALSE)

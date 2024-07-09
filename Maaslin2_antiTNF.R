@@ -40,4 +40,4 @@ maaslin2_all_results_noBio <- fit_data_noBio$results
 maaslin2_results_noBio <- maaslin2_all_results_noBio %>% filter(metadata == 'antiTNF_vs_noBiologics_mod')
 maaslin2_results_noBio$qval <- p.adjust(maaslin2_results_noBio$pval, method = 'BH')
 
-write.table(maaslin2_results_noBio, "Output_files/Maaslin2/antiTNF_vs_noBiologics/maaslin2_results_antiTNF_vs_noBio.txt", sep = "\t",  quote = FALSE)
+write.table(maaslin2_results_noBio, "Output_files/Maaslin2/maaslin2_results_antiTNF_vs_noBio.txt", sep = "\t",  quote = FALSE)

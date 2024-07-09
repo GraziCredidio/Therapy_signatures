@@ -42,4 +42,4 @@ maaslin2_all_results_aza_noSyst <- fit_data_aza_noSyst$results
 maaslin2_results_aza_noSyst <- maaslin2_all_results_aza_noSyst %>% filter(metadata == 'aza_vs_noSyst_mod') 
 maaslin2_results_aza_noSyst$qval <- p.adjust(maaslin2_results_aza_noSyst$pval, method = 'BH')
 
-write.table(maaslin2_results_aza_noSyst, "Output_files/Maaslin2/aza_vs_noSyst/maaslin2_results_aza_vs_noSyst.txt", sep = "\t",  quote = FALSE)
+write.table(maaslin2_results_aza_noSyst, "Output_files/Maaslin2/maaslin2_results_aza_vs_noSyst.txt", sep = "\t",  quote = FALSE)
