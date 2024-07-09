@@ -15,12 +15,11 @@ if (!dir.exists(folder)) {
 }
 
 # Loading data ----
-data <- read.csv("./Raw_tables/EZECohort_coldata_raw.csv")
+data <- read.csv("Raw_tables/EZECohort_coldata_raw.csv")
 
 # Remove patients that will not be included in analysis (non omics, outliers) ----
 excluded_patients <- c("EZE323","EZE421", "EZE253", "EZE128", "EZE023", "EZE565", "EZE272", "EZE151", "EZE357")
 
-            
 data_filtered <- data %>%
   filter(inclusion_omics == 1) %>% 
   filter(!((study_id %in% excluded_patients)))
@@ -158,7 +157,6 @@ data_filtered <- data_filtered %>%
   ))) %>%
   relocate(bmi_class, .after = bmi) 
 
-
 data_filtered <- data_filtered %>% 
   mutate(prednisolone_status = recode(prednisolone_status,
                                       "1" = "Never",
@@ -206,7 +204,7 @@ data_filtered$diagnosis_class <- str_replace_all(data_filtered$diagnosis_class, 
 # Replace empty cells with NA
 data_filtered$smoking <- str_replace_na(data_filtered$smoking, "NA")
 data_filtered$remission <- str_replace_na(data_filtered$remission, "NA")
-data_filtered$bmi_class <- str_replace_na(data_filtered$bmi_class, "NA") 
+#data_filtered$bmi_class <- str_replace_na(data_filtered$bmi_class, "NA") 
 
 # Exclude patients without crp and bmi data
 data_filtered <- data_filtered %>% 
