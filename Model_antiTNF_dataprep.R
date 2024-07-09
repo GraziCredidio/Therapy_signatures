@@ -25,8 +25,9 @@ coldata <- coldata %>%
   dplyr::rename(antiTNF_vs_noBiologics = biologics_TNF) %>% 
   filter(!(diagnosis_class == "Arthrosis" | diagnosis_class == "SLE" | diagnosis_class == "Pso"))
 
-# Filtering for patients with CRP < 5
+# Filtering for remitters with CRP < 5
 coldata <- coldata %>% 
+  filter(remission == "R") %>% 
   filter(crp < 5)
 
 # Transforming categorical columns as factor
