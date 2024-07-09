@@ -41,7 +41,7 @@ coldata <- coldata%>%
 # Counts normalization: DESeq2 ----
 dds_counts <- DESeqDataSetFromMatrix(countData = counts,
                                      colData = coldata,
-                                     design = ~ diagnosis_class + sex + age_group + biologics)
+                                     design = ~ diagnosis_class + sex + age_group + bmi_class + biologics)
 dds_counts <- dds_counts[ rowSums(counts(dds_counts) == 0) < 0.8*ncol(counts), ]
 dds_counts <- estimateSizeFactors(dds_counts)
 
