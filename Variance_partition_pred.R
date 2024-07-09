@@ -41,7 +41,7 @@ coldata_pred <- coldata_pred %>%
 form <- ~  crp_log + leucocytes +  erythrocytes + thrombocytes + (1|pred_vs_noSyst) + (1|biologics) + (1|diagnosis_class) + (1|age_group) + (1|bmi_class)  + (1|sex)
 varPart <- fitExtractVarPartModel(vst_sig, form, coldata_pred)
 
-write.table(varPart, "Output_files/VariancePartition/pred/varPart_pred.txt", sep="\t", row.names=TRUE)
+write.table(varPart, "Output_files/Variance_partition/pred/varPart_pred.txt", sep="\t", row.names=TRUE)
 
 # Plots ----
 varpart_ord <- sortCols(varPart) 
@@ -53,7 +53,7 @@ varpart_ord_genes <- as.data.frame(varpart_ord) %>%
 plotPercentBars(varpart_ord_genes[1:15,]) #saved as: "Output_files/Variance_partition/pred/plots/varpart_pred_top15"
 
 # Correlations ----
-formula_corr <- ~ crp_log + diagnosis_class + age_group + bmi_class + pred_vs_noSyst + sex + biologics
+formula_corr <- ~ crp_log + diagnosis_class + age_group + bmi_class + pred_vs_noSyst + sex + biologics + leucocytes + erythrocytes + thrombocytes
 
 C = canCorPairs(formula_corr, coldata_pred)
-plotCorrMatrix(C) #saved as: "Output_files/Variance_partition/aza/plots/correlation"
+plotCorrMatrix(C) #saved as: "Output_files/Variance_partition/pred/plots/correlation"
