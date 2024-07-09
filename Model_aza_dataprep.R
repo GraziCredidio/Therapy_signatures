@@ -34,8 +34,9 @@ coldata <- coldata %>%
     (No_syst == "1") ~ "no_syst")) %>% 
   relocate(aza_vs_noSyst, .after = No_syst)
 
-# Filtering for patients with CRP < 5
+# Filtering for remitters with CRP < 5
 coldata <- coldata %>% 
+  filter(remission == "R") %>% 
   filter(crp < 5)
 
 # Transforming categorical columns as factor
