@@ -93,7 +93,7 @@ col_ha_pred = HeatmapAnnotation(df = data.frame(
   )
 
 # Heatmap plotting
-pdf(file = "Output_files/Heatmaps/heatmap_antiTNF_healthy.pdf", width = 10, height= 12)
+pdf(file = "Output_files/Heatmaps/heatmap_pred_healthy.pdf", width = 10, height= 12)
 hm = ComplexHeatmap::Heatmap(m.top50_ed_R_pred, top_annotation = col_ha_pred, show_column_names = FALSE, name = "Z score", 
                              show_row_names = TRUE, border = TRUE, column_split = coldata_pred$pred_vs_noSyst, column_gap = unit(2, "mm"),
                              cluster_row_slices = T,cluster_column_slices = FALSE, row_title_rot = 0,
