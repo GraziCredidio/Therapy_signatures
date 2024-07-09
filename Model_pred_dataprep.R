@@ -21,7 +21,7 @@ counts <-  read.csv("Cleaned_tables/EZECohort_counts_ord.txt", sep="\t")
 # Exploring, cleaning and formatting coldata ----
 # Filtering for pred and no systemic patients and excluding Pso patients 
 coldata <- coldata %>% 
-  filter(Prednisolon == "1" | No_syst == "1") %>%  #420 patients either use prednisolon or no other systemic therapy
+  filter(Prednisolon == "1" | No_syst == "1") %>%  #420 patients either use prednisolone or no other systemic therapy
   filter(!(diagnosis_class == "Pso"))
 
 coldata <- coldata %>% 
