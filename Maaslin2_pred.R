@@ -1,6 +1,6 @@
 # EZE cohort: Therapy Signatures
   # Linear Mixed Model
-  # Prednisolone vs No Systhemic Therapies
+  # Prednisolone vs No Systemic Therapies
   # Author: Graziella Credidio
 
 rm(list = ls())

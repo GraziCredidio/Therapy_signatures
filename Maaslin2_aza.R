@@ -1,6 +1,6 @@
 # EZE cohort: Therapy Signatures
   # Linear Mixed Model
-  # AntiTNF vs No Biologics
+  # Azathioprine vs No Systemic Therapies
   # Author: Graziella Credidio
 
 rm(list = ls())
