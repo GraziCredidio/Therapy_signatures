@@ -47,7 +47,7 @@ plotVarPart(varPart_ord) #saved as: "Output_files/Variance_partition/aza/plots/v
 
 varPart_ord_genes <- as.data.frame(varPart_ord) %>% 
   arrange(desc(aza_vs_noSyst))
-plotPercentBars(varPart_ord_genes[1:15,]) + theme(legend.position="bottom") #saved as: "Output_files/Variance_partition/aza/plots/varpart_aza_top20"
+plotPercentBars(varPart_ord_genes[1:15,]) + theme(legend.position="bottom") #saved as: "Output_files/Variance_partition/aza/plots/varpart_aza_top15"
 
 # Correlations ----
 formula_corr <- ~ crp_log + diagnosis_class + age_group + bmi_class + aza_vs_noSyst + sex + biologics + leucocytes + erythrocytes + thrombocytes
