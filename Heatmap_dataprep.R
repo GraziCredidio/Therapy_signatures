@@ -5,10 +5,8 @@
 rm(list = ls())
 
 # Loading packages ----
-library(ComplexHeatmap)
 library(DESeq2)
 library(tidyverse)
-library(circlize)
 
 # Loading files ----
 coldata_antiTNF <- read.table("Cleaned_tables/models/antiTNF/EZECohort_coldata_antiTNF.txt", sep = "\t")
