@@ -73,21 +73,21 @@ idx_antiTNF <- match(colnames(counts_full_antiTNF), rownames(coldata_antiTNF_ful
 ord.coldata_antiTNF_full <- coldata_antiTNF_full[idx_antiTNF, ]
 ord.coldata_antiTNF_full <- ord.coldata_antiTNF_full %>%
   mutate_at('antiTNF_vs_noBiologics', ~replace_na(.,"Healthy"))
-#write.table(ord.coldata_antiTNF_full, "Output_files/Maaslin2/Tables/Remission_crp/coldata_heatmap_antiTNF_healthy_R_crp.txt", sep = "\t", row.names = TRUE)
+write.table(ord.coldata_antiTNF_full, "Cleaned_tables/heatmaps/hm_coldata_antiTNF.txt", sep = "\t", row.names = TRUE)
 
 counts_full_pred <- counts_full[,colnames(counts_full) %in% coldata_pred_full$sample_id]
 idx_pred <- match(colnames(counts_full_pred), rownames(coldata_pred_full)) 
 ord.coldata_pred_full <- coldata_pred_full[idx_pred, ]
 ord.coldata_pred_full <- ord.coldata_pred_full %>%
   mutate_at('pred_vs_noSyst', ~replace_na(.,"Healthy"))
-#write.table(ord.coldata_pred_noSyst_full, "Output_files/Maaslin2/Tables/Remission_crp/coldata_heatmap_pred_healthy_R_crp.txt", sep = "\t", row.names = TRUE)
+write.table(ord.coldata_pred_full, "Cleaned_tables/heatmaps/hm_coldata_pred.txt", sep = "\t", row.names = TRUE)
 
 counts_full_aza <- counts_full[,colnames(counts_full) %in% coldata_aza_full$sample_id]
 idx_aza <- match(colnames(counts_full_aza), rownames(coldata_aza_full)) 
 ord.coldata_aza_full <- coldata_aza_full[idx_aza, ]
 ord.coldata_aza_full <- ord.coldata_aza_full %>%
   mutate_at('aza_vs_noSyst', ~replace_na(.,"Healthy"))
-#write.table(ord.coldata_aza_noSyst_full, "Output_files/Maaslin2/Tables/Remission_crp/coldata_heatmap_aza_healthy_R_crp.txt", sep = "\t", row.names = TRUE)
+write.table(ord.coldata_aza_full, "Cleaned_tables/heatmaps/hm_coldata_aza.txt", sep = "\t", row.names = TRUE)
 
 # Normalizing counts ---- 
 normalized_full <- function(counts, ordColdata, pathNorm){
@@ -105,12 +105,12 @@ normalized_full <- function(counts, ordColdata, pathNorm){
 
 normalized_full(counts = counts_full_antiTNF,
                 ordColdata = ord.coldata_antiTNF_full,
-                "Cleaned_tables/heatmaps/hm_normalized_antiTNF.txt")
+                "Cleaned_tables/heatmaps/hm_normalized_counts_antiTNF.txt")
 
 normalized_full(counts = counts_full_pred,
                 ordColdata = ord.coldata_pred_full,
-                "Cleaned_tables/heatmaps/hm_normalized_pred.txt")
+                "Cleaned_tables/heatmaps/hm_normalized_counts_pred.txt")
 
 normalized_full(counts = counts_full_aza,
                 ordColdata = ord.coldata_aza_full,
-                "Cleaned_tables/heatmaps/hm_normalized_aza.txt")
+                "Cleaned_tables/heatmaps/hm_normalized_counts_aza.txt")
