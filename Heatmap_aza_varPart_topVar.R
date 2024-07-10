@@ -83,7 +83,7 @@ col_ha_aza = HeatmapAnnotation(df = data.frame(
   CRP = anno_barplot(coldata_aza$crp)
   )
 
-pdf(file = "Output_files/Heatmaps/heatmap_aza_healthy.pdf", width = 10, height= 15)
+pdf(file = "Output_files/Heatmaps/aza/heatmap_aza_healthy.pdf", width = 10, height= 15)
 hm = ComplexHeatmap::Heatmap(m.heatmap_ed_scaled, top_annotation = col_ha_aza, show_column_names = FALSE, name = "Z score", 
                              height = unit(30, "cm"), width = unit(15, "cm"),show_row_names = TRUE, border = TRUE, 
                              column_split = coldata_aza$aza_vs_noSyst, column_gap = unit(2, "mm"),

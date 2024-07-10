@@ -95,7 +95,7 @@ col_ha_antiTNF = HeatmapAnnotation(df = data.frame(
   CRP = anno_barplot(coldata_antiTNF$crp))
 
 
-pdf(file = "Output_files/Heatmaps/heatmap_antiTNF_healthy.pdf", width = 10, height= 12)
+pdf(file = "Output_files/Heatmaps/antiTNF/heatmap_antiTNF_healthy.pdf", width = 10, height= 12)
 row_ha = rowAnnotation(df = data.frame(Comparison = hm_row_annotation$Comparison),
                             col = list(Comparison=c("Shared (DEGs + TVGs)"="#E69F00", 
                                                     "Unique DEGs" = "#56B4E9")),
