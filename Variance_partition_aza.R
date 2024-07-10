@@ -59,4 +59,4 @@ plotCorrMatrix(C) #saved as: "Output_files/Variance_partition/aza/plots/correlat
 top25percent_varPart <- varPart_ord_genes %>% 
   filter(aza_vs_noSyst >= 0.25)
 
-write.table(top25percent_varPart, "Output_files/VariancePartition/aza/top25percent_varPart_aza.txt", sep="\t", row.names=TRUE)
+write.table(top25percent_varPart, "Output_files/Variance_partition/aza/top25percent_varPart_aza.txt", sep="\t", row.names=TRUE)
