@@ -106,11 +106,13 @@ all_correlations_padj <- all_correlations_padj %>% #excluding gene names column
 
 # Heatmap preprocessing ----
 # Reordering genes to match heatmap (figure 15A) and transforming as matrix
-order <- c("BOK", "CLIC3", "MLC1", "SPON2", "PRF1", "NMUR1","KIR2DL3","KIR2DL1","KIR3DL1","SLC1A7","GNLY","CLDND2","NKG7","FGFBP2","GZMB",   
-           "PRSS23", "ADGRG1","TBX21","S1PR5","C1orf21","FCRL6" ,   "CCL4"  ,   "XCL2"    , "FASLG"  ,  "CD160"   , "GZMA" ,    "KLRF1"  ,  
-           "KLRD1"  ,  "HOPX"  ,   "NCAM1", "SH2D1B",   "RNF165" ,  "DGKK",     "AKR1C3",   "GRIK4",    "TSPEAR",   "CTSE",     "GADD45A",
-           "HEPACAM2", "TMCC2",    "RHAG",     "CR1L",     "C2orf88",  "RPL3L" ,   "SHISA4",  "GDF15" ,   "ITLN1" ,   "KEL",      "AQP1",
-           "KCNH2"  ,  "PGF"   ,   "YPEL4"  ,  "DYRK3"  ,  "KRT79"  ,  "ETV7"  ,   "KIR2DL4" , "TCL1A"  ,  "CD72"   ,  "CORO2B")
+order <- c("BOK", "CLIC3", "MLC1", "SPON2", "PRF1", "NMUR1","KIR2DL3","KIR2DL1","KIR3DL1",
+           "SLC1A7","GNLY","CLDND2","NKG7","FGFBP2","GZMB", "PRSS23", "ADGRG1", "TBX21", 
+           "S1PR5", "C1orf21", "FCRL6", "CCL4", "XCL2", "FASLG", "CD160", "GZMA", "KLRF1",  
+           "KLRD1",  "HOPX", "NCAM1", "SH2D1B", "RNF165", "DGKK", "AKR1C3", "GRIK4", "TSPEAR",   
+           "CTSE", "GADD45A", "HEPACAM2", "TMCC2", "RHAG", "CR1L", "C2orf88", "RPL3L", "SHISA4",  
+           "GDF15", "ITLN1", "KEL", "AQP1", "KCNH2", "PGF", "YPEL4", "DYRK3", "KRT79", "ETV7",   
+           "KIR2DL4", "TCL1A", "CD72", "CORO2B")
 
 all_correlations_rho <- all_correlations_rho[order(match(rownames(all_correlations_rho), order)), , drop = FALSE]
 all_correlations_rho <- as.matrix(all_correlations_rho)
@@ -123,7 +125,7 @@ palette <- colorRampPalette(c("#440d57", "#20928c", "#efe51c"))
 palette_hm <- palette(10)
 
 pdf(file = "Output_files/Heatmaps/aza/correlation_heatmap_aza.pdf", width = 10, height= 15)
-heatmap_corr <- (Heatmap(all_correlations_rho,
+heatmap_corr <- Heatmap(all_correlations_rho,
                          cell_fun = function(j, i, x, y, w, h, fill) {
                            if(all_correlations_padj[i, j] < 0.001) {
                              grid.text("***", x, y)
@@ -141,8 +143,8 @@ heatmap_corr <- (Heatmap(all_correlations_rho,
                                                                                               legend_width = unit(7, "cm"),
                                                                                               legend_direction = "horizontal"
                                                                                               )
-                         )
-                 )
+                        )
+                 
 
 draw(heatmap_corr, heatmap_legend_side = "bottom")
 dev.off()
