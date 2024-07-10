@@ -120,6 +120,7 @@ all_correlations_padj <- as.matrix(all_correlations_padj)
 palette <- colorRampPalette(c("#440d57", "#20928c", "#efe51c"))
 palette_hm <- palette(10)
 
+pdf(file = "Output_files/Heatmaps/pred/correlation_heatmap_pred.pdf", width = 10, height= 15)
 heatmap_corr <- Heatmap(all_correlations_rho,
                         cell_fun = function(j, i, x, y, w, h, fill) {
                           if(all_correlations_padj[i, j] < 0.001) {
@@ -141,3 +142,4 @@ heatmap_corr <- Heatmap(all_correlations_rho,
                         )
 
 draw(heatmap_corr, heatmap_legend_side = "bottom")
+dev.off()
