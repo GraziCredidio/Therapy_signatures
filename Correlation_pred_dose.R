@@ -1,54 +1,62 @@
 # EZE cohort: Therapy Signatures
-  # Correlation of clinical parameters and DEGs  
-  # Figures 10B and 15B (Master's thesis) 
+  # Correlation of clinical parameters and DEGs: prednisolone x no systemic therapies
+  # Top 50 DEGs with absLFC > 0.5 shared with TVGs 
+  # Figure 10B (Master's thesis)
   # Author: Graziella Credidio
 
 rm(list = ls())
 
-
-library(ggpubr)
+# Loading packages ----
 library(tidyverse)
-
+library(ComplexHeatmap)
+library(RColorBrewer)
 
 # Loading data ----
-coldata_R_pred <- read.table("Cleaned_tables/models/pred/EZECohort_coldata_pred.txt", sep = "\t")
-vst_counts_R_pred <- read.table("Cleaned_tables/models/pred/vst_counts_pred.txt", sep = "\t")
-sig_genes_R_pred <- read.table( "Output_files/Maaslin2/significant_results/maaslin2_significant_results_pred_vs_noSyst.txt", sep = "\t")
-redcap <- read.csv("Raw_tables/EZECohort_coldata_raw.csv")
+ensg2gene <- read.table("Cleaned_tables/ensg2gene_EZE.txt", header = TRUE, sep = ",")
+unique_ensg2gene <- subset(ensg2gene, duplicated(ensg2gene$ensembl_gene_id) == FALSE)
+rownames(unique_ensg2gene) <- unique_ensg2gene$ensembl_gene_id
 
+coldata_pred <- read.table("Cleaned_tables/models/pred/EZECohort_coldata_pred.txt", sep = "\t")
+vst_counts <- read.table("Cleaned_tables/models/pred/vst_counts_pred.txt", sep = "\t")
+sig_genes <- read.table("Output_files/Maaslin2/significant_results/maaslin2_significant_results_pred_vs_noSyst.txt", sep = "\t")
 
-### STOPPED HERE
-sig_genes_topVar_lfc0.5 <- read.table("Output_files/Heatmap/vst_sig_genes_maaslin2_remission_crp/pred/Pred_top50_siggenes_lfc0.5_topVar_HM.txt", sep = "\t")
+# TVG
+topVar <- read.table("Cleaned_tables/topVar_2000_genes.txt", sep = "\t")
+topVar_genes <- rownames(topVar)
 
-# Extracting leukocytes, thrombocytes and erythrocytes from redcap coldata (updated)
-redcap_patients <- redcap[redcap$study_id %in% coldata_R_pred$study_id,]
-redcap_patients <- redcap_patients %>% 
-  dplyr::select(study_id, leucocytes, erythrocytes, thrombocytes, neutrophils)
+# Extracting top50 DEGs (absLFC > 0.5) shared with TVG----
+sig_genes_lfc0.5 <- sig_genes %>% 
+  filter(abs(coef) > 0.5)
 
-idx <- match(coldata_R_pred$study_id, redcap_patients$study_id) #matching order of patients
-ord_redcap_patients <- redcap_patients[idx,]
+sig_genes_lfc0.5_TVG <- sig_genes_lfc0.5[sig_genes_lfc0.5$feature %in% topVar_genes,]
+sig_genes_lfc0.5_TVG <- sig_genes_lfc0.5_TVG %>% 
+  arrange(qval)
+sig_genes_lfc0.5_TVG <- sig_genes_lfc0.5_TVG[!(is.na(sig_genes_lfc0.5_TVG$genes) | sig_genes_lfc0.5_TVG$genes == ""), ]
 
-coldata_R_pred <- left_join(coldata_R_pred, ord_redcap_patients, by = "study_id")
+top50_sig_genes_lfc0.5 <- sig_genes_lfc0.5_TVG[1:50,]
 
-# subsetting vst counts to patients with pred dose info
-vst_counts_R_pred <- vst_counts_R_pred[,colnames(vst_counts_R_pred) %in% coldata_R_pred$sample_id] 
+# Filtering vst_counts to top50 DEGs
+top50_counts <- vst_counts[top50_sig_genes_lfc0.5$feature, ]
 
-# excluding genes without names from sig genes
-sig_genes_R_pred <- sig_genes_R_pred %>% 
-  filter(!(genes == ""))
+# Matching gene counts samples to prednisolone patients ----
+coldata_pred <- coldata_pred %>% 
+  filter(Prednisolon == 1)
 
-# Correlation
-genes <- sig_genes_R_pred[sig_genes_R_pred$feature %in% sig_genes_topVar_lfc0.5$feature,1]
-#genes <- sig_genes_R_pred[1:30, 1]
+top50_counts <- top50_counts[,colnames(top50_counts) %in% coldata_pred$sample_id] 
+
+# Correlation dataframe ----
+#genes <- sig_genes[sig_genes$feature %in% sig_genes_topVar_lfc0.5$feature,1]
+genes <- row.names(top50_counts)
 all_correlations <- data.frame()
 
 for (i in 1:length(genes)) {
   sig_gene <- genes[i]
   
-  gene_counts <- vst_counts_R_pred[rownames(vst_counts_R_pred) == sig_gene,]
+  gene_counts <- top50_counts[rownames(top50_counts) == sig_gene,]
+    #vst_counts_R_pred[rownames(vst_counts_R_pred) == sig_gene,]
   coldata_gene <- as.data.frame(t(gene_counts))
   coldata_gene$sample_id <- rownames(coldata_gene)
-  coldata_gene <- left_join(coldata_gene, coldata_R_pred, by = "sample_id")
+  coldata_gene <- left_join(coldata_gene, coldata_pred, by = "sample_id")
   
   correlation_pred <- cor.test(coldata_gene[,1], coldata_gene$prednisolone_dose,  method = "spearman", exact=FALSE)
   correlation_age <- cor.test(coldata_gene[,1], coldata_gene$age,  method = "spearman", exact=FALSE)
@@ -58,7 +66,6 @@ for (i in 1:length(genes)) {
   correlation_erythro <- cor.test(coldata_gene[,1], coldata_gene$erythrocytes,  method = "spearman", exact=FALSE)
   correlation_thrombo <- cor.test(coldata_gene[,1], coldata_gene$thrombocytes,  method = "spearman", exact=FALSE)
   correlation_neutrophils <- cor.test(coldata_gene[,1], coldata_gene$neutrophils,  method = "spearman", exact=FALSE)
-  
   
   all_correlations <- rbind(all_correlations, data.frame(row.names = sig_gene, 
                                                          Pred_dose = correlation_pred$estimate, P_value_pred = correlation_pred$p.value,
@@ -73,8 +80,7 @@ for (i in 1:length(genes)) {
   
 }
 
-
-# Separating data frames with Rho and p-values
+# Rho and p-value data frames
 all_correlations_rho <- all_correlations %>% 
   dplyr::select(Pred_dose, Age, BMI, CRP, Leukocytes, Erythrocytes, Thrombocytes, Neutrophils)
 
@@ -87,164 +93,51 @@ all_correlations_padj <- all_correlations_p %>%
   as.vector %>% 
   p.adjust(method='BH') %>% 
   matrix(ncol=8)
-
 all_correlations_padj <- as.data.frame(all_correlations_padj)
 rownames(all_correlations_padj) <- rownames(all_correlations_p)
 colnames(all_correlations_padj) <- colnames(all_correlations_p)
 
-# which(all_correlations_p < 0.05)
-# which(all_correlations_padj < 0.05)
-
-# replacing gene symbols by gene names
-ensg2gene <- read.table("Cleaned_tables/ensg2gene_EZE.txt", header = TRUE, sep = ",")
-unique_ensg2gene <- subset(ensg2gene, duplicated(ensg2gene$ensembl_gene_id) == FALSE)
-rownames(unique_ensg2gene) <- unique_ensg2gene$ensembl_gene_id
-
+# Replacing gene symbols by gene names----
 rownames(all_correlations_rho) <- unique_ensg2gene[rownames(all_correlations_rho), ]$hgnc_symbol
 rownames(all_correlations_padj) <- unique_ensg2gene[rownames(all_correlations_padj), ]$hgnc_symbol
 
-# Heatmap
-library(ComplexHeatmap)
-library(RColorBrewer)
+# Heatmap preprocessing----
+# Reordering genes to match heatmap (figure 10A) and transforming as matrix
+order <- c("DBH-AS1", "LIMS2", "ID3", "SPIB", "IRS2", "MIR223HG", "CLEC4E", "TLR2", "FKBP5",
+           "KCNE1", "ECHDC3", "TPST1", "INHBB", "NSUN7", "DUSP1", "TSC22D3", "GADD45A", "ASPH",     
+           "IRAK3", "ZNF608", "VNN1", "GPR141", "SIPA1L2", "IL18R1", "PFKFB2", "SLC8A1", "COL9A2",  
+           "VSIG4", "DAAM2", "MAOA", "FLT3", "AMPH", "IL1R2", "ADAMTS2", "OLAH", "GRB10", "PCSK9", 
+           "ARG1", "LINC02207", "ABCG1", "PPIAP29", "SLC5A9", "DUSP13", "IFITM3P2", "CD163", "GPER1", 
+           "C5orf67", "SLC22A4", "TLR5", "NAIP")
 
+all_correlations_rho <- all_correlations_rho[order(match(rownames(all_correlations_rho), order)), , drop = FALSE]
+all_correlations_rho <- as.matrix(all_correlations_rho)
+
+all_correlations_padj <- all_correlations_padj[order(match(rownames(all_correlations_padj), order)), , drop = FALSE]
+all_correlations_padj <- as.matrix(all_correlations_padj)
+
+# Heatmap ----
 palette <- colorRampPalette(c("#440d57", "#20928c", "#efe51c"))
 palette_hm <- palette(10)
 
-heatmap_a <- Heatmap(t(as.matrix(all_correlations_rho)), show_row_dend = FALSE, show_column_dend = FALSE, name = "Spearman's Rho", height = unit(5, "cm"), width = unit(16, "cm"),
-                     col = palette_hm, row_names_side = "left",  column_names_side = "top", column_names_rot = 45, column_names_gp = gpar(fontsize = 10),
-                     heatmap_legend_param = list(
-                       title = "Spearman's Rho", at = c(-1, -0.8, 0, 0.8, 1),
-                       title_position = "topcenter", legend_width = unit(7, "cm"),
-                       legend_direction = "horizontal"
-                     ))
+heatmap_corr <- Heatmap(all_correlations_rho,
+                        cell_fun = function(j, i, x, y, w, h, fill) {
+                          if(all_correlations_padj[i, j] < 0.001) {
+                            grid.text("***", x, y)
+                            } else if(all_correlations_padj[i, j] < 0.01) {
+                              grid.text("**", x, y)
+                              } else if(all_correlations_padj[i, j] < 0.05) {
+                                grid.text("*", x, y)
+                                }
+                          },
+                        show_row_dend = FALSE, show_column_dend = FALSE, name = "Spearman's Rho", 
+                        height = unit(30, "cm"), width = unit(7, "cm"), col = palette_hm, 
+                        row_names_side = "left",  column_names_side = "top", column_names_rot = 45,
+                        row_order = order,heatmap_legend_param = list(title = "Spearman's Rho", 
+                                                                      at = c(-1, -0.8, 0, 0.8, 1),
+                                                                      title_position = "topcenter", 
+                                                                      legend_width = unit(7, "cm"),
+                                                                      legend_direction = "horizontal")
+                        )
 
-draw(heatmap_a, heatmap_legend_side = "bottom")
-
-
-
-# Inserting * on significant correlations
-padj_all_correlations <- t(as.matrix(all_correlations_padj))
-all_correlations_rho <- t(as.matrix(all_correlations_rho))
-
-heatmap_significant <- Heatmap(all_correlations_rho, 
-        cell_fun = function(j, i, x, y, w, h, fill) {
-  if(padj_all_correlations[i, j] < 0.001) {
-    grid.text("***", x, y)
-  } else if(padj_all_correlations[i, j] < 0.01) {
-    grid.text("**", x, y)
-    } else if(padj_all_correlations[i, j] < 0.05) {
-    grid.text("*", x, y)
-    }
-   },
-show_row_dend = FALSE, show_column_dend = FALSE, name = "Spearman's Rho", height = unit(5, "cm"), width = unit(16, "cm"),
-col = palette_hm, row_names_side = "left",  column_names_side = "top", column_names_rot = 45, column_names_gp = gpar(fontsize = 10),
-heatmap_legend_param = list(
-  title = "Spearman's Rho", at = c(-1, -0.8, 0, 0.8, 1),
-  title_position = "topcenter", legend_width = unit(7, "cm"),
-  legend_direction = "horizontal"
-))
-
-draw(heatmap_significant, heatmap_legend_side = "bottom")
-
-
-### Reordering to match heatmap order
-
-order <- c("DBH-AS1",   "LIMS2",     "ID3",       "SPIB" ,     "IRS2"  ,    "MIR223HG" , "CLEC4E"  ,  "TLR2" ,     "FKBP5",
-           "KCNE1"  ,   "ECHDC3"  ,  "TPST1"  ,   "INHBB"   ,  "NSUN7"   , "DUSP1"  ,   "TSC22D3",   "GADD45A" ,  "ASPH" ,     
-           "IRAK3",     "ZNF608" ,   "VNN1" ,     "GPR141" ,   "SIPA1L2" ,  "IL18R1" ,   "PFKFB2" ,   "SLC8A1" ,   "COL9A2"  ,  "VSIG4" ,   
-           "DAAM2"  ,   "MAOA"  ,    "FLT3"  ,    "AMPH"  ,    "IL1R2"  ,   "ADAMTS2" ,  "OLAH"  ,    "GRB10"  ,   "PCSK9" ,    "ARG1",
-           "LINC02207", "ABCG1"  ,   "PPIAP29" ,  "SLC5A9"  ,  "DUSP13"  ,  "IFITM3P2" , "CD163"  ,   "GPER1"  ,   "C5orf67"  , "SLC22A4"  , "TLR5"   ,   "NAIP")
-
-all_correlations_rho <- all_correlations_rho[order(match(rownames(all_correlations_rho), order)), , drop = FALSE]
-all_correlations_padj <- all_correlations_padj[order(match(rownames(all_correlations_padj), order)), , drop = FALSE]
-
-
-# Inserting * on significant correlations
-padj_all_correlations <- t(as.matrix(all_correlations_padj))
-all_correlations_rho <- t(as.matrix(all_correlations_rho))
-
-heatmap_significant <- Heatmap(all_correlations_rho, 
-                               cell_fun = function(j, i, x, y, w, h, fill) {
-                                 if(padj_all_correlations[i, j] < 0.001) {
-                                   grid.text("***", x, y)
-                                 } else if(padj_all_correlations[i, j] < 0.01) {
-                                   grid.text("**", x, y)
-                                 } else if(padj_all_correlations[i, j] < 0.05) {
-                                   grid.text("*", x, y)
-                                 }
-                               },
-                               show_row_dend = FALSE, show_column_dend = FALSE, name = "Spearman's Rho", height = unit(5, "cm"), width = unit(30, "cm"),
-                               col = palette_hm, row_names_side = "left",  column_names_side = "top", column_names_rot = 45, column_names_gp = gpar(fontsize = 10),
-                               column_order= order,
-                               heatmap_legend_param = list(
-                                 title = "Spearman's Rho", at = c(-1, -0.8, 0, 0.8, 1),
-                                 title_position = "topcenter", legend_width = unit(7, "cm"),
-                                 legend_direction = "horizontal"
-                               ))
-
-draw(heatmap_significant, heatmap_legend_side = "bottom")
-
-
-# vertical
-padj_all_correlations <- as.matrix(all_correlations_padj)
-all_correlations_rho <- as.matrix(all_correlations_rho)
-
-
-heatmap_significant <- Heatmap(t(all_correlations_rho), 
-                               cell_fun = function(j, i, x, y, w, h, fill) {
-                                 if(padj_all_correlations[i, j] < 0.001) {
-                                   grid.text("***", x, y)
-                                 } else if(padj_all_correlations[i, j] < 0.01) {
-                                   grid.text("**", x, y)
-                                 } else if(padj_all_correlations[i, j] < 0.05) {
-                                   grid.text("*", x, y)
-                                 }
-                               },
-                               show_row_dend = FALSE, show_column_dend = FALSE, name = "Spearman's Rho", height = unit(30, "cm"), width = unit(7, "cm"),
-                               col = palette_hm, row_names_side = "left",  column_names_side = "top", column_names_rot = 45, #column_names_gp = gpar(fontsize = 10),
-                               row_order = order,
-                               heatmap_legend_param = list(
-                                 title = "Spearman's Rho", at = c(-1, -0.8, 0, 0.8, 1),
-                                 title_position = "topcenter", legend_width = unit(7, "cm"),
-                                 legend_direction = "horizontal"
-                               ))
-
-draw(heatmap_significant, heatmap_legend_side = "bottom")
-
-
-
-
-
-
-
-male <- coldata_R_pred %>% 
-  filter(sex == "Male")
-
-mean(male$thrombocytes)
-sd(male$thrombocytes)
-
-mean(male$erythrocytes)
-sd(male$erythrocytes)
-
-mean(male$leucocytes)
-sd(male$leucocytes)
-
-
-
-female <- coldata_R_pred %>% 
-  filter(sex == "Female") %>% 
-  filter(!(is.na(thrombocytes)))
-
-mean(female$thrombocytes)
-sd(female$thrombocytes)
-
-mean(female$erythrocytes)
-sd(female$erythrocytes)
-
-mean(female$leucocytes)
-sd(female$leucocytes)
-
-
-
-write.table(male, "Output_files/Lab_parameters/Males_pred.txt", sep = "\t")
-write.table(female, "Output_files/Lab_parameters/Females_pred.txt", sep = "\t")
+draw(heatmap_corr, heatmap_legend_side = "bottom")
