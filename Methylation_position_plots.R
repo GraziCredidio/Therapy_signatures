@@ -1,7 +1,7 @@
 # EZE cohort: Therapy Signatures
   # DNA methylation-linked DEGs visualizations
-  # Location of methylated sites and expression of DEGs: Figures 6B, 12B, 17B
-  # Density plots: Figures 6D, 12D, 19B
+  # Location of methylated sites and expression of DEGs
+  # Figures 6B, 12B, 17B
   # Author: Graziella Credidio
 
 
