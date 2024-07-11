@@ -7,14 +7,7 @@ rm(list = ls())
 
 # Loading packages ----
 library(topGO)
-library(org.Hs.eg.db)
-library(GO.db)
-library(ComplexHeatmap)
-library(RColorBrewer)
-library(plyr)
-library(tibble)
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(kableExtra)
 
 # Loading data ----
@@ -31,6 +24,7 @@ up_sig_genes <- degs %>%
 up_dnam_degs <- sig_gene_meth_site_correlation[sig_gene_meth_site_correlation$Gene %in% up_sig_genes,]
 upgenes <- unique(up_dnam_degs$Gene)
 upgenes_topVar <- intersect(upgenes, topVarGenes_names)
+write.table(up_dnam_degs, file = "Output_files/Methylation/aza/aza_upregulated_DNAm_DEG.txt", quote = FALSE, sep = '\t')
 
 down_sig_genes <- degs %>% 
   filter(coef < 0) %>% 
@@ -38,6 +32,7 @@ down_sig_genes <- degs %>%
 down_dnam_degs <- sig_gene_meth_site_correlation[sig_gene_meth_site_correlation$Gene %in% down_sig_genes,]
 downgenes <- unique(down_dnam_degs$Gene)
 downgenes_topvar <- intersect(downgenes, topVarGenes_names)
+write.table(down_dnam_degs, file = "Output_files/Methylation/aza/aza_downregulated_DNAm_DEG.txt", quote = FALSE, sep = '\t')
 
 # GO analysis for upregulated and downregulated genes ----
 gene_set <- list(upgenes_topVar, downgenes_topvar)
