@@ -3,19 +3,12 @@
   # Anti-TNF x No Biologics 
   # Author: Graziella Credidio
 
+rm(list = ls())
+
 # Loading packages ----
 library(topGO)
-library(org.Hs.eg.db)
-library(GO.db)
-library(ComplexHeatmap)
-library(RColorBrewer)
-library(plyr)
-library(tibble)
-library(dplyr)
-library(ggplot2)
+library(tidyverse)
 library(kableExtra)
-
-rm(list = ls())
 
 # Loading data ----
 sig_gene_meth_site_correlation <- read.table("Output_files/Methylation/antiTNF/antiTNF_significant_DEG_meth_site_correlation_5000bp_1000rep.txt", sep = '\t')
@@ -28,13 +21,14 @@ up_sig_genes <- degs %>%
   pull(feature)
 up_dnam_degs <- sig_gene_meth_site_correlation[sig_gene_meth_site_correlation$Gene %in% up_sig_genes,]
 upgenes <- unique(up_dnam_degs$Gene)
+write.table(up_dnam_degs, file = "Output_files/Methylation/antiTNF/antiTNF_upregulated_DNAm_DEG.txt", quote = FALSE, sep = '\t')
 
 down_sig_genes <- degs %>% 
   filter(coef < 0) %>% 
   pull(feature)
 down_dnam_degs <- sig_gene_meth_site_correlation[sig_gene_meth_site_correlation$Gene %in% down_sig_genes,]
 downgenes <- unique(down_dnam_degs$Gene)
-
+write.table(down_dnam_degs, file = "Output_files/Methylation/antiTNF/antiTNF_downregulated_DNAm_DEG.txt", quote = FALSE, sep = '\t')
 
 # GO analysis for upregulated and downregulated genes ----
 gene_set <- list(upgenes, downgenes)
