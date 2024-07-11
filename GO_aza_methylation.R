@@ -22,10 +22,9 @@ sig_gene_meth_site_correlation <- read.table("Output_files/Methylation/aza/aza_s
 transcriptome_data <- read.table("Cleaned_tables/models/aza/normalized_counts_aza.txt", sep = "\t")
 degs <- read.table("Output_files/Maaslin2/significant_results/maaslin2_significant_results_aza_vs_noSyst.txt", sep = '\t')
 topVarGenes <- read.table("Cleaned_tables/topVar_2000_genes.txt", sep = "\t")
-
-# Split into down and upregulated DNAm linked DEGs in common with TVGs ----
 topVarGenes_names <- rownames(topVarGenes)
 
+# Split into down and upregulated DNAm linked DEGs in common with TVGs ----
 up_sig_genes <- degs %>% 
   filter(coef > 0) %>% 
   pull(feature)
@@ -86,7 +85,7 @@ for (g in 1:length(gene_set)){
     go_results$Genes[i] <- gene_sym_in_cat_str
   }
   
-  # Calculating gene ration and adding it as a column of go_results
+  # Calculating gene ratio and adding it as a column of go_results
   go_results <- go_results %>% 
     mutate(geneRatio = go_results[,4]/go_results[,3]) %>% 
     relocate(geneRatio, .after = Expected)
