@@ -9,7 +9,6 @@ rm(list = ls())
 
 # Loading packages ----
 library(tidyverse)
-library(ggridges)
 
 # Loading data ----
 # Azathioprine
