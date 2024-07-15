@@ -180,28 +180,3 @@ plot_remitters_patients_treatments
 ggsave(plot_remitters_patients_treatments,
        file = "Output_files/Patients_distribution/inactive_byComparison_byDiagnosis.png",
        height = 8, width = 15, units = "in", dpi = 300)
-
-
-
-
-# Supplementary figure 1: Inactive disease patients by comparison and diagnosis
-breaks <- seq(from = 0, to = 600, by = 50)
-plot_remitters_patients_comparisons <- ggplot(all_coldata, aes(Comparison, fill = diagnosis_class)) +
-  geom_bar() + theme_bw() +
-  geom_text(aes(label = after_stat(count)), stat = "count", hjust = 0.5, position = position_stack(vjust = 0.5), colour = "#808080", size = 5) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
-    axis.title.x=element_blank(),
-    axis.title.y =element_blank(),
-    title = element_text(size = 24),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 14)
-  ) +
-  scale_y_continuous(breaks = breaks) +
-  labs(fill= 'Diagnosis',
-       title = "Inactive disease patients") +
-  scale_fill_brewer(type = "qual", palette = "Pastel2")
-plot_remitters_patients_comparisons 
-ggsave(plot_remitters_patients_comparisons, 
-       file = "Output_files/Patients_distribution/inactive_byComparison_byDiagnosis.png", 
-       height = 8, width = 15, units = "in", dpi = 300)
