@@ -62,7 +62,7 @@ all_degs_plot <- ggplot(all_sig_genes, aes(Coef_distribution, fill = Coef_distri
               axis.ticks.x=element_blank(),
         text=element_text(size=40))
 all_degs_plot
-ggsave(all_degs_plot, file = 'Output_files/Maaslin2/plots/all_degs_coeff.png', height = 8, width = 10, units = "in", dpi = 300)
+ggsave(all_degs_plot, file = 'Output_files/Maaslin2/coeff_distribution/all_degs_coeff.png', height = 8, width = 10, units = "in", dpi = 300)
 
 # Figure 7B: DEGs absLFC > 0.5
 degs_lfc_plot <- ggplot(all_sig_genes_lfc, aes(Coef_distribution, fill = Coef_distribution)) +
@@ -77,4 +77,4 @@ degs_lfc_plot <- ggplot(all_sig_genes_lfc, aes(Coef_distribution, fill = Coef_di
         axis.ticks.x=element_blank(),
         text=element_text(size=40))
 degs_lfc_plot
-ggsave(degs_lfc_plot, file = 'Output_files/Maaslin2/plots/degs_lfc_coeff.png', height = 8, width = 10, units = "in", dpi = 300)
+ggsave(degs_lfc_plot, file = 'Output_files/Maaslin2/coeff_distribution/degs_lfc_coeff.png', height = 8, width = 10, units = "in", dpi = 300)
