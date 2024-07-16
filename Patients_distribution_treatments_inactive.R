@@ -178,5 +178,5 @@ plot_remitters_patients_treatments <- ggplot(all_coldata, aes(Treatment, fill = 
                             "Pred", "No pred", "No syst (pred)"))
 plot_remitters_patients_treatments 
 ggsave(plot_remitters_patients_treatments,
-       file = "Output_files/Patients_distribution/inactive_byComparison_byDiagnosis.png",
+       file = "Output_files/Patients_distribution/inactive_byTreatment_byDiagnosis.png",
        height = 8, width = 15, units = "in", dpi = 300)
