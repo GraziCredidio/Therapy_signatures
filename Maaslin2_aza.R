@@ -48,7 +48,7 @@ fit_model_aza <- function(coldata, vst_counts, outputPath, resultsPath){
     analysis_method = "LM",
     normalization = "NONE",
     transform = "NONE",
-    output = "outputPath",
+    output = outputPath,
     fixed_effects = c("aza_vs_noSyst_mod", "crp_log", "sex", "biologics", "diagnosis_class"),
     random_effects = c("age_group", "bmi_class"))
   
