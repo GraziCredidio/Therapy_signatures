@@ -59,7 +59,7 @@ ord.coldata_inactive <- coldata_inactive[idx2, ]
 all(rownames(ord.coldata_inactive) %in% colnames(counts_inactive))
 all(colnames(counts_inactive) == rownames(ord.coldata_inactive))
 
-write.table(ord.coldata_inactive, "Cleaned_tables/models/antiTNF/EZECohort_coldata_aza.txt", sep = "\t", row.names = TRUE)
+write.table(ord.coldata_inactive, "Cleaned_tables/models/aza/EZECohort_coldata_aza.txt", sep = "\t", row.names = TRUE)
 
 # Normalizing counts ----
 deseq_norm <- function(counts, coldata){
