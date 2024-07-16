@@ -39,4 +39,4 @@ significant_genes(maaslin_analysis_inactive,
 # all patients
 significant_genes(maaslin_analysis_all, 
                   "Output_files/Maaslin2/results/allPatients/maaslin2_results_",
-                  "Output_files/Maaslin2/significant_results/allPatients/maaslin2_allPatients_significant_results_")
+                  "Output_files/Maaslin2/significant_results/allPatients/maaslin2_significant_results_")
