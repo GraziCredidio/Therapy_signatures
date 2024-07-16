@@ -36,7 +36,7 @@ counts_all <- counts[,colnames(counts) %in% coldata$sample_id]
 idx <- match(colnames(counts_all), rownames(coldata)) 
 ord.coldata_all <- coldata[idx, ]
 
-all(rownames(ord.coldata) %in% colnames(counts_all))
+all(rownames(ord.coldata_all) %in% colnames(counts_all))
 all(colnames(counts_all) == rownames(ord.coldata_all))
 
 write.table(ord.coldata_all, "Cleaned_tables/models/antiTNF/EZECohort_coldata_antiTNF_allPatients.txt", sep = "\t", row.names = TRUE)
