@@ -1,6 +1,7 @@
 # EZE cohort: Therapy Signatures
   # Linear Mixed Model
-  # Prednisolone vs No Systemic Therapies
+  # Prednisolone vs No systemic therapy
+  # Inactive and all patients models
   # Author: Graziella Credidio
 
 rm(list = ls())
@@ -10,35 +11,60 @@ library(tidyverse)
 library(Maaslin2)
 
 # Loading data ----
+# Inactive disease patients
 coldata_pred_noSyst <- read.table("Cleaned_tables/models/pred/EZECohort_coldata_pred.txt", sep = "\t")
 vst_pred_noSyst <- read.table("Cleaned_tables/models/pred/vst_counts_pred.txt", sep = "\t")
 
-# Setting no_syst as the reference value ----
-coldata_pred_noSyst$pred_vs_noSyst_mod = coldata_pred_noSyst$pred_vs_noSyst
-coldata_pred_noSyst$pred_vs_noSyst_mod[coldata_pred_noSyst$pred_vs_noSyst_mod == "no_syst"] =
-  "a_noSyst"
-coldata_pred_noSyst$pred_vs_noSyst_mod[coldata_pred_noSyst$pred_vs_noSyst_mod == "pred"] =
-  "z_pred"
+# All patients
+all_coldata_pred_noSyst <- read.table("Cleaned_tables/models/pred/EZECohort_coldata_pred_allPatients.txt", sep = "\t")
+all_vst_pred_noSyst <- read.table("Cleaned_tables/models/pred/vst_counts_pred_allPatients.txt", sep = "\t")
 
-coldata_pred_noSyst <- coldata_pred_noSyst %>% 
-  mutate(across(c(diagnosis_class, age_group,  
-                  sex, bmi_class, pred_vs_noSyst_mod), as.factor))
+# Coldata preprocessing ----
+preprocessing_coldata <- function(coldata){
+  # Setting reference values
+  coldata$pred_vs_noSyst_mod = coldata$pred_vs_noSyst
+  coldata$pred_vs_noSyst_mod[coldata$pred_vs_noSyst_mod == "no_syst"] = "a_noSyst"
+  coldata$pred_vs_noSyst_mod[coldata$pred_vs_noSyst_mod == "pred"] = "z_pred"
+  
+  coldata <- coldata %>% 
+    mutate(across(c(diagnosis_class, age_group,  
+                    sex, bmi_class, pred_vs_noSyst_mod), as.factor))
+  
+  return(coldata)
+}
 
-dir.create("Output_files/Maaslin2/pred_vs_noSyst")
+coldata_pred_noSyst <- preprocessing_coldata(coldata_pred_noSyst)  
+all_coldata_pred_noSyst <- preprocessing_coldata(all_coldata_aza_noSyst) 
 
-fit_data_pred_noSyst = Maaslin2( 
-  input_data = vst_pred_noSyst, 
-  input_metadata = coldata_pred_noSyst, 
-  analysis_method = "LM",
-  normalization = "NONE",
-  transform = "NONE",
-  output = "Output_files/Maaslin2/pred_vs_noSyst", 
-  fixed_effects = c("pred_vs_noSyst_mod", "crp_log", "sex", "biologics"),
-  random_effects = c("diagnosis_class", "age_group", "bmi_class"))
+# Creating output directories ----
+dir.create("Output_files/Maaslin2/pred_vs_noSyst/inactive")
+dir.create("Output_files/Maaslin2/pred_vs_noSyst/allPatients")
 
-# Generating tables
-maaslin2_all_results_pred_noSyst <- fit_data_pred_noSyst$results
-maaslin2_results_pred_noSyst <- maaslin2_all_results_pred_noSyst %>% filter(metadata == 'pred_vs_noSyst_mod') 
-maaslin2_results_pred_noSyst$qval <- p.adjust(maaslin2_results_pred_noSyst$pval, method = 'BH')
+# Maaslin2 model ----
+fit_model_pred <- function(coldata, vst_counts, outputPath, resultsPath){
+  model = Maaslin2( 
+    input_data = vst_counts, 
+    input_metadata = coldata, 
+    analysis_method = "LM",
+    normalization = "NONE",
+    transform = "NONE",
+    output = outputPath,
+    fixed_effects = c("pred_vs_noSyst_mod", "crp_log", "sex", "biologics"),
+    random_effects = c("diagnosis_class", "age_group", "bmi_class"))
+  
+  # Generating tables
+  maaslin2_all_results_pred_noSyst <- model$results
+  maaslin2_results_pred_noSyst <- maaslin2_all_results_pred_noSyst %>% filter(metadata == 'pred_vs_noSyst_mod') 
+  maaslin2_results_pred_noSyst$qval <- p.adjust(maaslin2_results_pred_noSyst$pval, method = 'BH')
+  
+  write.table(maaslin2_results_pred_noSyst, resultsPath, sep = "\t",  quote = FALSE)
+}
 
-write.table(maaslin2_results_pred_noSyst, "Output_files/Maaslin2/maaslin2_results_pred_vs_noSyst.txt", sep = "\t",  quote = FALSE)
+
+fit_model_pred(coldata = coldata_pred_noSyst, vst_counts = vst_pred_noSyst, 
+              outputPath = "Output_files/Maaslin2/pred_vs_noSyst/inactive",
+              resultsPath = "Output_files/Maaslin2/results/inactive/maaslin2_results_pred_vs_noSyst.txt")
+
+fit_model_pred(coldata = all_coldata_pred_noSyst, vst_counts = all_vst_pred_noSyst, 
+              outputPath = "Output_files/Maaslin2/pred_vs_noSyst/allPatients",
+              resultsPath = "Output_files/Maaslin2/results/allPatients/maaslin2_results_pred_vs_noSyst_allPatients.txt")
