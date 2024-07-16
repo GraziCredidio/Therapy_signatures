@@ -9,9 +9,6 @@ rm(list = ls())
 library(data.table)
 library(tidyverse)
 library(ggrepel)
-library(RColorBrewer)
-library(Rgraphviz)
-library(plotly)
 
 # Loading and preparing data ----
 ensg2gene <- read.table("Cleaned_tables/ensg2gene_EZE.txt", header = TRUE, sep = ",")
