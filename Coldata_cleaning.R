@@ -222,12 +222,5 @@ data_filtered <- data_filtered %>%
   mutate(crp_log = log(crp + 0.001)) %>% 
   relocate(crp_log, .after = crp)
 
-# Selecting data that will be used for models ----
-coldata_maaslin <- data_filtered %>% 
-  dplyr::select("study_id", "diagnosis_class", "age_group", "sex", "remission", "bmi_class", 
-                "Azathioprin", "Prednisolon", "No_syst", "crp_log", "current_biologics", 
-                "biologics_TNF", "biologics")
-
 # Saving cleaned data tables ----
 write.table(data_filtered, "Cleaned_tables/EZECohort_coldata_clean.txt", sep="\t", row.names = TRUE)
-write.table(coldata_maaslin, "Cleaned_tables/EZECohort_coldata_models.txt", sep="\t", row.names = FALSE) 
