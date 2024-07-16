@@ -5,8 +5,13 @@
 
 rm(list = ls())
 
+folder <- "Output_files/Lab_params"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
-library(ggpubr)
+library(tidyverse)
 
 # Loading files ----
 coldata_antiTNF <- read.table("Cleaned_tables/models/antiTNF/EZECohort_coldata_antiTNF.txt", sep = "\t")
