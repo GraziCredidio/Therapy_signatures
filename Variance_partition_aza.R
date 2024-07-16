@@ -7,7 +7,6 @@
 rm(list = ls())
 
 # Loading packages ----
-if (!require("BiocManager", quietly = TRUE)) BiocManager::install("variancePartition")
 library(variancePartition)
 library(tidyverse)
 
