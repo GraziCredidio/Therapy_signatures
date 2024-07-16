@@ -9,16 +9,6 @@ rm(list = ls())
 library(tidyverse)
 library(ggvenn)
 
-# # Venn diagram of up and downregulated genes ----
-# if (!require(devtools)) install.packages("devtools")
-# devtools::install_github("yanlinlin82/ggvenn")
-# install.packages("rlist")
-# 
-# library(tidyverse)
-# library(ggvenn)
-# library(circlize)
-# library(rlist)
-
 # Loading data ----
 topVarGenes <- read.table("Cleaned_tables/topVar_2000_genes.txt", sep = "\t") #TVG all patients
 topVarGenes_names <- rownames(topVarGenes)
