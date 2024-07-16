@@ -103,16 +103,16 @@ venn_degs <- function(data, fillColors, filePath) {
 
 # Creating venn diagrams
 # Anti-TNF
-dir.create("Output_files/Venn_diagrams/antiTNF")
-venn_degs(list_antiTNF_up, up_fillColors, "Output_files/Venn_diagrams/antiTNF/venn_up_antiTNF.pdf")
-venn_degs(list_antiTNF_down, down_fillColors, "Output_files/Venn_diagrams/antiTNF/venn_down_antiTNF.pdf")
+dir.create("Output_files/Venn_diagrams/degs/antiTNF")
+venn_degs(list_antiTNF_up, up_fillColors, "Output_files/Venn_diagrams/degs/antiTNF/venn_up_antiTNF.pdf")
+venn_degs(list_antiTNF_down, down_fillColors, "Output_files/Venn_diagrams/degs/antiTNF/venn_down_antiTNF.pdf")
 
 # Aza
-dir.create("Output_files/Venn_diagrams/aza")
-venn_degs(list_aza_up, up_fillColors, "Output_files/Venn_diagrams/aza/venn_up_aza.pdf")
-venn_degs(list_aza_down, down_fillColors, "Output_files/Venn_diagrams/aza/venn_down_aza.pdf")
+dir.create("Output_files/Venn_diagrams/degs/aza")
+venn_degs(list_aza_up, up_fillColors, "Output_files/Venn_diagrams/degs/aza/venn_up_aza.pdf")
+venn_degs(list_aza_down, down_fillColors, "Output_files/Venn_diagrams/degs/aza/venn_down_aza.pdf")
 
 # Pred
-dir.create("Output_files/Venn_diagrams/pred")
-venn_degs(list_pred_up, up_fillColors, "Output_files/Venn_diagrams/pred/venn_up_pred.pdf")
-venn_degs(list_pred_down, down_fillColors, "Output_files/Venn_diagrams/pred/venn_down_pred.pdf")
+dir.create("Output_files/Venn_diagrams/degs/pred")
+venn_degs(list_pred_up, up_fillColors, "Output_files/Venn_diagrams/degs/pred/venn_up_pred.pdf")
+venn_degs(list_pred_down, down_fillColors, "Output_files/Venn_diagrams/degs/pred/venn_down_pred.pdf")
