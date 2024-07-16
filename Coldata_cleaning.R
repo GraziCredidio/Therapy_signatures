@@ -7,7 +7,6 @@ rm(list = ls())
 # Loading packages ----
 library(tidyverse)
 library(stringr)
-library(rebus)
 
 folder <- "Cleaned_tables/"
 if (!dir.exists(folder)) {
