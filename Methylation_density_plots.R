@@ -5,6 +5,12 @@
 
 rm(list = ls())
 
+folder <- "Output_files/Methylation/antiTNF/GO"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
+
 # Loading packages ----
 library(tidyverse)
 library(ggridges)

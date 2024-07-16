@@ -5,14 +5,14 @@
 
 rm(list = ls())
 
-# Loading packages ----
-library(variancePartition)
-library(tidyverse)
-
 folder <- "Output_files/Variance_partition/antiTNF"
 if (!dir.exists(folder)) {
   dir.create(folder)
 }
+
+# Loading packages ----
+library(variancePartition)
+library(tidyverse)
 
 # Loading files ----
 ensg2gene <- read.table("Cleaned_tables/ensg2gene_EZE.txt", header = TRUE, sep = ",")

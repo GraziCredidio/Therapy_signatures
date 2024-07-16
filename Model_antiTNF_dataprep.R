@@ -5,14 +5,14 @@
 
 rm(list = ls())
 
-# Loading packages ----
-library(tidyverse)
-library(DESeq2)
-
 folder <- "Cleaned_tables/models/antiTNF"
 if (!dir.exists(folder)) {
   dir.create(folder)
 }
+
+# Loading packages ----
+library(tidyverse)
+library(DESeq2)
 
 # Loading data ----
 coldata <- read.csv("Cleaned_tables/EZECohort_coldata_clean_ord.txt", sep="\t")

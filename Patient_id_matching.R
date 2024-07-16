@@ -4,6 +4,11 @@
 
 rm(list = ls())
 
+folder <- "Cleaned_tables/"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(tidyverse)
 

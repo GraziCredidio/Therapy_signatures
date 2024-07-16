@@ -4,8 +4,14 @@
   # Figures 6B, 12B, 17B
   # Author: Graziella Credidio
 
-
 rm(list = ls())
+
+folders <- c("Output_files/Methylation/aza", "Output_files/Methylation/pred", "Output_files/Methylation/antiTNF")
+for (i in folders){
+  if (!dir.exists(i)) {
+    dir.create(i)}
+}
+
 
 # Loading packages ----
 library(tidyverse)

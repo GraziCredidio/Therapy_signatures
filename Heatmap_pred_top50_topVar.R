@@ -5,6 +5,11 @@
 
 rm(list = ls())
 
+folder <- "Output_files/Heatmaps/pred"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(ComplexHeatmap)
 library(tidyverse)

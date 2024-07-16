@@ -5,6 +5,11 @@
 
 rm(list = ls())
 
+folder <- "Output_files/Expression_plot"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(tidyverse)
 

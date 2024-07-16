@@ -6,6 +6,12 @@
 
 rm(list = ls())
 
+folders <- c("Output_files/Maaslin2/aza_vs_noSyst/inactive", "Output_files/Maaslin2/aza_vs_noSyst/allPatients")
+for (i in folders){
+  if (!dir.exists(i)) {
+    dir.create(i)}
+}
+
 # Loading packages ----
 library(tidyverse)
 library(Maaslin2)
@@ -35,10 +41,6 @@ preprocessing_coldata <- function(coldata){
 
 coldata_aza_noSyst <- preprocessing_coldata(coldata_aza_noSyst)  
 all_coldata_aza_noSyst <- preprocessing_coldata(all_coldata_aza_noSyst) 
-
-# Creating output directories ----
-dir.create("Output_files/Maaslin2/aza_vs_noSyst/inactive")
-dir.create("Output_files/Maaslin2/aza_vs_noSyst/allPatients")
 
 # Maaslin2 model ----
 fit_model_aza <- function(coldata, vst_counts, outputPath, resultsPath){

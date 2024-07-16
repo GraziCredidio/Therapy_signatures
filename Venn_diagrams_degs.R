@@ -5,6 +5,12 @@
 
 rm(list = ls())
 
+folders <- c("Output_files/Venn_diagrams/degs/aza", "Output_files/Venn_diagrams/degs/pred", "Output_files/Venn_diagrams/degs/antiTNF")
+for (i in folders){
+  if (!dir.exists(i)) {
+    dir.create(i)}
+}
+
 # Loading packages ----
 library(tidyverse)
 library(ggvenn)

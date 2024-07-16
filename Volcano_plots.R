@@ -5,6 +5,12 @@
 
 rm(list = ls())
 
+
+folder <- "Output_files/Volcano_plots"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(data.table)
 library(tidyverse)

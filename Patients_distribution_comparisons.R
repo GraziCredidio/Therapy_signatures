@@ -5,6 +5,11 @@
 
 rm(list = ls())
 
+folder <- "Output_files/Patients_distribution"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(RColorBrewer)
 library(tidyverse)

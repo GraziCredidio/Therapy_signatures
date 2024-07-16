@@ -10,6 +10,12 @@
 
 rm(list = ls())
 
+folders <- c("Output_files/GO/aza", "Output_files/GO/pred", "Output_files/GO/antiTNF")
+for (i in folders){
+  if (!dir.exists(i)) {
+    dir.create(i)}
+}
+
 # Loading packages ----
 library(DESeq2)
 library(genefilter)
@@ -17,14 +23,6 @@ library(tidyverse)
 library(topGO)
 library(data.table)
 
-# Crating folders ----
-folders <- c("Output_files/GO/aza", "Output_files/GO/pred", "Output_files/GO/antiTNF")
-
-for (i in folders){
-  if (!dir.exists(i)) {
-    dir.create(i)}
-}
-  
 # Loading data ----
 topVar <- read.table("Cleaned_tables/topVar_2000_genes.txt", sep = "\t")
 topVar_genes <- rownames(topVar)

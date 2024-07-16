@@ -5,13 +5,13 @@
 
 rm(list = ls())
 
-# Loading files ----
-library(tidyverse)
-
-folder <- "Output_files/Maaslin2/plots"
+folder <- "Output_files/Maaslin2/coeff_distribution"
 if (!dir.exists(folder)) {
   dir.create(folder)
 }
+
+# Loading files ----
+library(tidyverse)
 
 # Loading data----
 pred_sig_genes <- read.table("Output_files/Maaslin2/significant_results/maaslin2_significant_results_pred_vs_noSyst.txt", sep = "\t")

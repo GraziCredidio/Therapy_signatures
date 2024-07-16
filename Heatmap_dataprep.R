@@ -4,6 +4,11 @@
 
 rm(list = ls())
 
+folder <- "Cleaned_tables/heatmaps"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(DESeq2)
 library(tidyverse)

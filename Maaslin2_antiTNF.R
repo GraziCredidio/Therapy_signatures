@@ -6,6 +6,12 @@
 
 rm(list = ls())
 
+folders <- c("Output_files/Maaslin2/antiTNF_vs_noBio/inactive", "Output_files/Maaslin2/antiTNF_vs_noBio/allPatients")
+for (i in folders){
+  if (!dir.exists(i)) {
+    dir.create(i)}
+}
+
 # Loading packages ----
 library(tidyverse)
 library(Maaslin2)
@@ -35,10 +41,6 @@ preprocessing_coldata <- function(coldata){
 
 coldata_noBio <- preprocessing_coldata(coldata_noBio)  
 all_oldata_noBio <- preprocessing_coldata(all_coldata_noBio) 
-
-# Creating output directories ----
-dir.create("Output_files/Maaslin2/antiTNF_vs_noBio/inactive")
-dir.create("Output_files/Maaslin2/antiTNF_vs_noBio/allPatients")
 
 # Maaslin2 model ----
 fit_model_antiTNF <- function(coldata, vst_counts, outputPath, resultsPath){
