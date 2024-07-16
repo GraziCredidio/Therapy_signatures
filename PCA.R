@@ -4,19 +4,17 @@
 
 rm(list = ls())
 
+folder <- "Output_files/PCA"
+if (!dir.exists(folder)) {
+  dir.create(folder)
+}
+
 # Loading packages ----
 library(data.table)
 library(tidyverse)
 library(ggrepel)
 library(DESeq2)
 library(RColorBrewer)
-library(Rgraphviz)
-library(plotly)
-
-folder <- "Output_files/PCA"
-if (!dir.exists(folder)) {
-  dir.create(folder)
-}
 
 # Loading files ----
 counts <- read.table("Cleaned_tables/EZECohort_counts_ord.txt", sep = "\t")
